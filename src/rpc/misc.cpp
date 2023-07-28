@@ -1077,7 +1077,7 @@ UniValue getusedcoinserials(const JSONRPCRequest& request)
     UniValue serializedSerials(UniValue::VARR);
     int i = 0;
     for ( auto it = serials.begin(); it != serials.end(); ++it, ++i) {
-        if (i < startNumber)
+        if ((serials.size() - i - 1) < startNumber)
             continue;
         std::vector<unsigned char> serialized;
         serialized.resize(32);
