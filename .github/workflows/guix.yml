@@ -13,6 +13,15 @@ jobs:
         run: |
           sudo apt-get install guix
           sudo apt-get install cmake
+      - name: Cache guix
+        uses: actions/cache@v4
+        with:
+            path: |
+              ~/.cache/guix
+              /gnu/store
+            key: guix-cache-
+            restore-keys: |
+              guix-cache-
       - name: Download macOS Xcode
         run: |
           mkdir depends/SDKs
