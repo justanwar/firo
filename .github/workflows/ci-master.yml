@@ -59,6 +59,7 @@ jobs:
         name: ${{ env.SOURCE_ARTIFACT }}
     - name: Extract Archives
       run: |
+        ls
         tar -xzf depends.tar.gz
         tar -xzf firo-*.tar.gz --strip-components=1
       working-directory: ${{ env.SOURCE_ARTIFACT }}
