@@ -13,7 +13,7 @@ jobs:
         run: |
           sudo apt install guix
           sudo apt install cmake
-      - name: Download macOSO Xcode
+      - name: Download macOS Xcode
         run: |
           mkdir depends/SDKs
           wget https://bitcoincore.org/depends-sources/sdks/Xcode-12.2-12B45b-extracted-SDK-with-libcxx-headers.tar.gz
