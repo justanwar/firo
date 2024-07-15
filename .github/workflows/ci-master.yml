@@ -43,8 +43,8 @@ jobs:
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: sauce
-        path: source_file
+        name: source
+        path: source
   build-linux:
     name: Build for Linux
     needs: create-source-distribution
@@ -60,20 +60,27 @@ jobs:
     - name: List files/dirs
       run: |
         ls
+        pwd
     - name: Extract Archives
       run: |
         tar -xzf depends.tar.gz
         tar -xzf firo-*.tar.gz --strip-components=1
+        pwd
       working-directory: ${{ env.SOURCE_ARTIFACT }}
     - name: Install Required Packages
       run: |
         sudo apt-get update
         sudo apt-get install -y python3-zmq
+        pwd
     - name: Build Dependencies
-      run: make -C depends -j$(nproc)
+      run: 
+        pwd
+        cd firo
+        make -C depends -j$(nproc)
       working-directory: ${{ env.SOURCE_ARTIFACT }}
     - name: Build Firo
       run: |
+        pwd
         ./configure --disable-jni --enable-tests --with-comparison-tool=no --prefix=$(realpath depends/x86_64-pc-linux-gnu)
         make -j$(nproc)
       working-directory: ${{ env.SOURCE_ARTIFACT }}
