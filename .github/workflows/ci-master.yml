@@ -43,8 +43,8 @@ jobs:
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: source
-        path: source
+        name: ${{ env.SOURCE_ARTIFACT }}
+        path: ${{ env.ARTIFACT_DIR }}
   build-linux:
     name: Build for Linux
     needs: create-source-distribution
@@ -53,35 +53,24 @@ jobs:
       ARTIFACT_DIR: linux-binaries
       TEST_LOG_ARTIFACT_DIR: test-logs
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
     - name: Getting Source
       uses: actions/download-artifact@v4
       with:
-        name: source
-        path: source
-    - name: List files/dirs
-      run: |
-        ls
-        pwd
+        name: ${{ env.SOURCE_ARTIFACT }}
     - name: Extract Archives
       run: |
         tar -xzf depends.tar.gz
         tar -xzf firo-*.tar.gz --strip-components=1
-        pwd
       working-directory: ${{ env.SOURCE_ARTIFACT }}
     - name: Install Required Packages
       run: |
         sudo apt-get update
         sudo apt-get install -y python3-zmq
-        pwd
     - name: Build Dependencies
-      run: 
-        pwd
-        make -C depends -j$(nproc)
+      run: make -C depends -j$(nproc)
+      working-directory: ${{ env.SOURCE_ARTIFACT }}
     - name: Build Firo
       run: |
-        pwd
         ./configure --disable-jni --enable-tests --with-comparison-tool=no --prefix=$(realpath depends/x86_64-pc-linux-gnu)
         make -j$(nproc)
       working-directory: ${{ env.SOURCE_ARTIFACT }}
