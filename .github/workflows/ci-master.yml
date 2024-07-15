@@ -79,7 +79,6 @@ jobs:
       run: 
         pwd
         make -C depends -j$(nproc)
-      working-directory: ${{ env.SOURCE_ARTIFACT }}
     - name: Build Firo
       run: |
         pwd
