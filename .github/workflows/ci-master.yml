@@ -14,12 +14,11 @@ on:
     - master
 env:
   SOURCE_ARTIFACT: source
+  SOURCE_ARTIFACT_DIR: source
 jobs:
   create-source-distribution:
     name: Create Source Distribution
     runs-on: ubuntu-latest
-    env:
-      ARTIFACT_DIR: source
     steps:
     - name: Checkout
       uses: actions/checkout@v4
@@ -44,7 +43,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: ${{ env.SOURCE_ARTIFACT }}
-        path: ${{ env.ARTIFACT_DIR }}
+        path: ${{ env.SOURCE_ARTIFACT_DIR }}
   build-linux:
     name: Build for Linux
     needs: create-source-distribution
@@ -57,6 +56,7 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: ${{ env.SOURCE_ARTIFACT }}
+        path: ${{ env.SOURCE_ARTIFACT_DIR }}
     - name: Extract Archives
       run: |
         tar -xzf depends.tar.gz
