@@ -43,8 +43,8 @@ jobs:
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: ${{ env.SOURCE_ARTIFACT }}
-        path: ${{ env.ARTIFACT_DIR }}
+        name: sauce
+        path: source_file
   build-linux:
     name: Build for Linux
     needs: create-source-distribution
@@ -58,7 +58,7 @@ jobs:
     - name: Getting Source
       uses: actions/download-artifact@v4
       with:
-        name: ${{ env.SOURCE_ARTIFACT }}
+        name: sauce
     - name: List files/dirs
       run: |
         ls
