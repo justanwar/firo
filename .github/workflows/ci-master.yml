@@ -428,6 +428,7 @@ jobs:
             ~/.local/share/guix
             /var/guix/cache
             /var/guix/archives
+            /gnu/store
           key: guix-${{ env.HOST }}-${{ hashFiles('contrib/guix/**') }}
           restore-keys: |
             guix-${{ env.HOST }}-
@@ -647,6 +648,7 @@ jobs:
             ~/.local/share/guix
             /var/guix/cache
             /var/guix/archives
+            /gnu/store
           key: guix-${{ env.HOST }}-${{ hashFiles('contrib/guix/**') }}
           restore-keys: |
             guix-${{ env.HOST }}-
