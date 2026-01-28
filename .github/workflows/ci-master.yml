@@ -439,7 +439,7 @@ jobs:
           chmod +x guix-install.sh
           # Disable pipefail strictly for this command so 'yes' crashing doesn't fail the build
           set +o pipefail
-          yes '' 2>/dev/null | sudo ./guix-install.sh
+          yes '' 2>/dev/null | sudo GUIX_ALLOW_OVERWRITE=1 ./guix-install.sh
           set -o pipefail
           echo "Guix install script completed"
           source /etc/profile.d/zzz-guix.sh
