@@ -402,8 +402,8 @@ jobs:
       - name: Prepare Guix cache dirs
         run: |
           set -exo pipefail
-          sudo mkdir -p /var/guix/cache /var/guix/archives
-          sudo chown -R $USER:$USER /var/guix/cache /var/guix/archives
+          sudo mkdir -p /var/guix/cache /var/guix/archives /gnu/store
+          sudo chown -R $USER:$USER /var/guix/cache /var/guix/archives /gnu/store
           mkdir -p ~/.cache/guix ~/.config/guix ~/.local/share/guix
       - name: Cache Guix downloads
         uses: actions/cache@v5
@@ -415,6 +415,7 @@ jobs:
             ~/.local/share/guix
             /var/guix/cache
             /var/guix/archives
+            /gnu/store
           key: guix-${{ matrix.host }}-${{ hashFiles('contrib/guix/**') }}
           restore-keys: |
             guix-${{ matrix.host }}-
