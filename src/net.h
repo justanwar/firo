@@ -805,8 +805,8 @@ public:
 
     // inventory based relay
     CRollingBloomFilter filterInventoryKnown;
-    // Set of Dandelion transactions that should be known to this peer
-    std::set<uint256> setDandelionInventoryKnown;
+    // Bounded bloom filter for Dandelion inventory known (same semantics as filterInventoryKnown)
+    CRollingBloomFilter filterDandelionInventoryKnown;
     // Set of transaction ids we still have to announce.
     // They are sorted by the mempool before relay, so the order is not important.
     std::set<uint256> setInventoryTxToSend;
@@ -992,7 +992,7 @@ public:
                     setInventoryForcedToSend.insert(inv.hash);
             }
         } else if (inv.type == MSG_DANDELION_TX) {
-        	if (fForce || setDandelionInventoryKnown.count(inv.hash) == 0) {
+        	if (fForce || !filterDandelionInventoryKnown.contains(inv.hash)) {
         		vInventoryDandelionTxToSend.push_back(inv.hash);
         	}
         } else if (inv.type == MSG_BLOCK) {
