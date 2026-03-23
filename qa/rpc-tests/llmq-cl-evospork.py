@@ -5,8 +5,9 @@
 
 from test_framework.mininode import *
 from test_framework.test_framework import EvoZnodeTestFramework
+from test_framework.authproxy import JSONRPCException
 from test_framework.util import *
-from time import *
+from time import time, sleep
 
 '''
 llmq-chainlocks.py
@@ -33,7 +34,7 @@ class LLMQChainLocksTest(EvoZnodeTestFramework):
 
         # mine single block, wait for chainlock
         self.nodes[0].generate(1)
-
+        sync_blocks(self.nodes)
         self.wait_for_chainlock_tip_all_nodes()
         self.payment_address = self.nodes[0].getaccountaddress("")
         self.nodes[0].sendtoaddress(self.payment_address, 1)
@@ -41,6 +42,7 @@ class LLMQChainLocksTest(EvoZnodeTestFramework):
         # mine many blocks, wait for chainlock
         while self.nodes[0].getblockcount() < 800:
             self.nodes[0].generate(20)
+        sync_blocks(self.nodes, timeout=120)
         self.wait_for_chainlock_tip_all_nodes()
 
         # assert that all blocks up until the tip are chainlocked
@@ -51,8 +53,7 @@ class LLMQChainLocksTest(EvoZnodeTestFramework):
         # cannot invalidate tip
         current_tip = self.nodes[0].getbestblockhash()
         self.nodes[0].invalidateblock(current_tip)
-        sleep(2)
-        assert(current_tip == self.nodes[0].getbestblockhash())
+        self.wait_for_tip(self.nodes[0], current_tip, timeout=15)
 
         ##### Disable chainlocks for 10 blocks
 
@@ -71,7 +72,9 @@ class LLMQChainLocksTest(EvoZnodeTestFramework):
 
         self.nodes[0].generate(10)
         self.nodes[0].spork('list')
-        self.wait_for_chainlock_tip_all_nodes()
+        connected_nodes = [n for n in self.nodes if n != self.nodes[5]]
+        sync_blocks(connected_nodes, timeout=120)
+        self.wait_for_chainlock_tip(connected_nodes)
         sporks = self.nodes[0].spork("list")
         assert(not sporks["blockchain"])
         assert(not sporks["mempool"])
@@ -82,19 +85,13 @@ class LLMQChainLocksTest(EvoZnodeTestFramework):
         reconnect_isolated_node(self.nodes[5], 1)
         self.nodes[0].generate(1)
         current_tip = self.nodes[0].getbestblockhash()
-        timeout = 15
-        while current_tip != self.nodes[5].getbestblockhash():
-            if timeout == 0: # retry
-                self.nodes[0].generate(1)
-                current_tip = self.nodes[0].getbestblockhash()
-                timeout = 15
-                break
-            sleep(1)
-            timeout = timeout - 1
-        while current_tip != self.nodes[5].getbestblockhash():
-            assert timeout > 0, "Timed out when waiting for a chainlocked chain"
-            sleep(1)
-            timeout = timeout - 1
+        if not self.wait_for_sync(self.nodes[0], self.nodes[5], timeout=15):
+            self.nodes[0].generate(1)
+            current_tip = self.nodes[0].getbestblockhash()
+            assert self.wait_for_sync(self.nodes[0], self.nodes[5], timeout=15), \
+                "Timed out when waiting for a chainlocked chain"
+        assert self.nodes[0].getbestblockhash() == current_tip, \
+            "Node 0 did not keep the chainlocked tip"
 
 
 
@@ -103,22 +100,50 @@ class LLMQChainLocksTest(EvoZnodeTestFramework):
             tip = node.getbestblockhash()
             self.wait_for_chainlock(node, tip)
 
-    def wait_for_chainlock_tip(self, node):
-        tip = node.getbestblockhash()
-        self.wait_for_chainlock(node, tip)
+    def wait_for_chainlock_tip(self, nodes):
+        if not isinstance(nodes, list):
+            nodes = [nodes]
+        for node in nodes:
+            tip = node.getbestblockhash()
+            self.wait_for_chainlock(node, tip)
 
-    def wait_for_chainlock(self, node, block_hash):
+    def wait_for_chainlock(self, node, block_hash, timeout=60):
         t = time()
-        while time() - t < 30:
+        while time() - t < timeout:
             try:
                 block = node.getblock(block_hash)
                 if block["confirmations"] > 0 and block["chainlock"]:
                     return
-            except:
-                # block might not be on the node yet
+            except JSONRPCException:
                 pass
             sleep(0.1)
-        raise AssertionError("wait_for_chainlock timed out")
+        raise AssertionError("wait_for_chainlock timed out for block %s" % block_hash)
+
+    def wait_for_sync(self, node1, node2, timeout=30):
+        """Wait until node1 has the same tip as node2. Returns True if synced, False on timeout."""
+        t = time()
+        while time() - t < timeout:
+            try:
+                if node1.getbestblockhash() == node2.getbestblockhash():
+                    return True
+            except JSONRPCException:
+                pass
+            sleep(0.5)
+        return False
+
+    def wait_for_tip(self, node, expected_tip, timeout=15):
+        """Wait until node's best block hash equals expected_tip."""
+        last_tip = "<unavailable>"
+        t = time()
+        while time() - t < timeout:
+            try:
+                last_tip = node.getbestblockhash()
+                if last_tip == expected_tip:
+                    return
+            except JSONRPCException:
+                pass
+            sleep(0.5)
+        raise AssertionError("wait_for_tip timed out: expected tip %s, got %s" % (expected_tip, last_tip))
 
     def disable_chainlocks(self, till_height):
         self.nodes[0].spork(self.sporkprivkey, self.payment_address, {"disable":{"chainlocks": till_height}})
