@@ -367,6 +367,16 @@ public:
         vSeeds.push_back(CDNSSeedData("sanfrancisco.firo.org", "sanfrancisco.firo.org", false));
         vSeeds.push_back(CDNSSeedData("tokyo.firo.org", "tokyo.firo.org", false));
         vSeeds.push_back(CDNSSeedData("singapore.firo.org", "singapore.firo.org", false));
+        vSeeds.push_back(CDNSSeedData("Amsterdam Onion Seed", "cglfbjlvrwiqo72sqe5xqvv744rbslghkkktxxgnzndq4vwv5qgcfxyd.onion", false));
+        vSeeds.push_back(CDNSSeedData("Australia Onion Seed", "yewswoh5bqptwqak5evd22mrsqhaejujnl2u3kf65q7utrxn7of3jbyd.onion", false));
+        vSeeds.push_back(CDNSSeedData("Chicago Onion Seed", "x36mnd73wuueel7yghml3dveg4yjzegkdlygu626pesru6ahldws6yad.onion", false));
+        vSeeds.push_back(CDNSSeedData("London Onion Seed", "frsikldgiu3iyz2w57wq6crcj6ddhsd3pouxzidytdnnq65nj7ll7aid.onion", false));
+        vSeeds.push_back(CDNSSeedData("Frankfurt Onion Seed", "fd657zrcexq4muu4pbwsdotjkh27mikomyg7gkli6irjbip6cbuz7rid.onion", false));
+        vSeeds.push_back(CDNSSeedData("New Jersey Onion Seed", "n52ofnhg3znbfiwj2iurl7vlspsfgnfiqinog4kzaglufvlpk5xgwxyd.onion", false));
+        vSeeds.push_back(CDNSSeedData("San Francisco Onion Seed", "vnlpmkpee3ogxjivdhegip7n6qlevpxet7aqqemu4rrvtfkn7vswrmad.onion", false));
+        vSeeds.push_back(CDNSSeedData("Tokyo Onion Seed", "icncc4n4ethcukhldzhilymu6pbazmqvi5lnwdjug6wcqqjzllcvqeqd.onion", false));
+        vSeeds.push_back(CDNSSeedData("Singapore Onion Seed", "6ctdeexfm65hqmu74if5y2sbskvcsmpofvzihj6hfrdopqzgq243tcad.onion", false));
+        
         // Note that of those with the service bits flag, most only support a subset of possible options
         base58Prefixes[PUBKEY_ADDRESS] = std::vector < unsigned char > (1, 82);
         base58Prefixes[SCRIPT_ADDRESS] = std::vector < unsigned char > (1, 7);
